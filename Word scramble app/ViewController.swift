@@ -64,6 +64,9 @@ class ViewController: UITableViewController {
     func submit(_ answer: String) { //creating the Submit button
         let lowerAnswer = answer.lowercased()
         
+        let errorTitle: String
+        let errorMessage: String
+        
         if isPOssible(word: lowerAnswer) {
             if isOriginal(word: lowerAnswer) {
                 if isReal(word: lowerAnswer) {
@@ -71,10 +74,27 @@ class ViewController: UITableViewController {
                     
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
+                    
+                    return
+                } else {
+                    errorTitle = "Word not recognized"
+                    errorMessage = "Heh, this word does not actually exist in the dictionary :)"
                 }
+            } else {
+                errorTitle = "The word was already used"
+                errorMessage = "You have to figure another one :)"
             }
+        } else {
+            errorTitle = "Word is not possible"
+            errorMessage = "Not sure that you can spell that word from \(title!.lowercased))"
         }
+        
+        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Ok", style: .default))
+        present(ac, animated: true)
     }
+    
+    
     // checks if the Word is possible based on the original
     func isPOssible(word: String) -> Bool {
         guard var temporaryWord = title?.lowercased() else { return false }
@@ -96,7 +116,7 @@ class ViewController: UITableViewController {
     
     // checks if the Word exists or simply random string
     func isReal(word: String) -> Bool {
-    let checker = UITextChecker()
+        let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         return mispelledRange.location == NSNotFound
