@@ -60,9 +60,32 @@ class ViewController: UITableViewController {
         ac.addAction(submitAction)
         present(ac, animated: true)
     }
-
+    
     func submit(_ answer: String) { //creating the Submit button
+        let lowerAnswer = answer.lowercased()
         
+        if isPOssible(word: lowerAnswer) {
+            if isOriginal(word: lowerAnswer) {
+                if isReal(word: lowerAnswer) {
+                    usedWords.insert(answer, at: 0)
+                    
+                    let indexPath = IndexPath(row: 0, section: 0)
+                    tableView.insertRows(at: [indexPath], with: .automatic)
+                }
+            }
+        }
+    }
+    // checks if the Word is possible based on the original
+    func isPOssible(word: String) -> Bool {
+        return true
+    }
+    // checks if the Word was not used before
+    func isOriginal(word: String) -> Bool {
+        return true
+    }
+    // checks if the Word exists or simply random string
+    func isReal(word: String) -> Bool {
+        return true
     }
 }
 
