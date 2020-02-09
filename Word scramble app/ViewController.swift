@@ -19,7 +19,6 @@ class ViewController: UITableViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(startGame))
-        //todo: to edit the "start" refresh button, as this has to be a "restart"
         
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
@@ -70,19 +69,25 @@ class ViewController: UITableViewController {
         let errorTitle: String
         let errorMessage: String
         
-        if isPOssible(word: lowerAnswer) {
-            if isOriginal(word: lowerAnswer) {
-                if isReal(word: lowerAnswer) {
-                    if isAllowed(word: lowerAnswer) {
-                        usedWords.insert(answer, at: 0) // would always be inserted at zero row
-                        
-                        let indexPath = IndexPath(row: 0, section: 0)
-                        tableView.insertRows(at: [indexPath], with: .automatic)
-                        
-                        return
+//        if isAsTitle(word: lowerAnswer) {
+            if isPOssible(word: lowerAnswer) {
+                if isOriginal(word: lowerAnswer) {
+                    if isReal(word: lowerAnswer) {
+                        if isShort(word: lowerAnswer) {
+                            usedWords.insert(answer, at: 0) // would always be inserted at zero row
+                            
+                            let indexPath = IndexPath(row: 0, section: 0)
+                            tableView.insertRows(at: [indexPath], with: .automatic)
+                            
+                            return
+                            
+                        } else {
+                            errorTitle = "Word is not allowed"
+                            errorMessage = "Word is too short"
+                        }
                     } else {
-                        errorTitle = "Word is not allowed"
-                        errorMessage = "This word is either short or the same"
+                        errorTitle = "Word not recognized"
+                        errorMessage = "Heh, this word does not actually exist in the dictionary :)"
                     }
                 } else {
                     errorTitle = "The word was already used"
@@ -92,10 +97,10 @@ class ViewController: UITableViewController {
                 guard let title = title else { return }
                 errorTitle = "Word is not possible"
                 errorMessage = "Not sure that you can spell that word from \(title.lowercased())"
-            }
-        } else {
-            errorTitle = "Word not recognized"
-            errorMessage = "Heh, this word does not actually exist in the dictionary :)"
+//            }
+//        } else {
+//            errorTitle = "Word not recognized"
+//            errorMessage = "The word is the same as the title"
         }
         
         let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
@@ -120,28 +125,27 @@ class ViewController: UITableViewController {
     
     // checks if the Word was not used before and stored in usedWords
     func isOriginal(word: String) -> Bool {
-        //        if word.count > 3 {
         return !usedWords.contains(word)
-        //        } else {
-        //            return false
     }
-}
-
-// checks if the Word exists or simply random string
-func isReal(word: String) -> Bool {
-    //        if word.count > 3 {
-    let checker = UITextChecker()
-    let range = NSRange(location: 0, length: word.utf16.count)
-    let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-    return mispelledRange.location == NSNotFound
-    //        } else {
-    //            return false
-}
-
-func isAllowed(word: String) -> Bool {
-    if word.count > 3 {
-        return word == word
-    } else {
-        return false
+    
+    // checks if the Word exists or simply random string
+    func isReal(word: String) -> Bool {
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        return mispelledRange.location == NSNotFound
     }
-}
+    
+    func isShort(word: String) -> Bool {
+        if word.count > 3 {
+            return true
+        } else {
+            return false
+        }
+    }
+//
+//        func isAsTitle(word: String) -> Bool {
+//            return !allWords.randomElement().contains(word)
+//        }
+//
+    }
