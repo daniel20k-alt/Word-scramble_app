@@ -67,7 +67,7 @@ class ViewController: UITableViewController {
         if isPOssible(word: lowerAnswer) {
             if isOriginal(word: lowerAnswer) {
                 if isReal(word: lowerAnswer) {
-                    usedWords.insert(answer, at: 0)
+                    usedWords.insert(answer, at: 0) // would always be inserted at zero row
                     
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
@@ -77,15 +77,29 @@ class ViewController: UITableViewController {
     }
     // checks if the Word is possible based on the original
     func isPOssible(word: String) -> Bool {
+        guard var temporaryWord = title?.lowercased() else { return false }
+        
+        for letter in word {
+            if let position = temporaryWord.firstIndex(of: letter) {
+                temporaryWord.remove(at: position)
+            } else {
+                return false
+            }
+        }
         return true
     }
-    // checks if the Word was not used before
+    
+    // checks if the Word was not used before and stored in usedWords
     func isOriginal(word: String) -> Bool {
-        return true
+        return !usedWords.contains(word)
     }
+    
     // checks if the Word exists or simply random string
     func isReal(word: String) -> Bool {
-        return true
+    let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        return mispelledRange.location == NSNotFound
     }
 }
 
