@@ -18,6 +18,7 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(startGame))
         
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
@@ -30,8 +31,9 @@ class ViewController: UITableViewController {
         
         startGame()
     }
+
     
-    func startGame() {
+    @objc func startGame() {
         title = allWords.randomElement() //the view control title
         usedWords.removeAll(keepingCapacity: true)  //removes all the values that the user has already guess so far
         tableView.reloadData()
@@ -85,8 +87,9 @@ class ViewController: UITableViewController {
                 errorMessage = "You have to figure another one :)"
             }
         } else {
+            guard let title = title else { return }
             errorTitle = "Word is not possible"
-            errorMessage = "Not sure that you can spell that word from \(title!.lowercased))"
+            errorMessage = "Not sure that you can spell that word from \(title.lowercased())"
         }
         
         let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
